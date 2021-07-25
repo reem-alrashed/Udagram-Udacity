@@ -1,0 +1,60 @@
+version: 2.1
+
+orbs:
+  eb: circleci/aws-elastic-beanstalk@1.0.0
+  node: circleci/node@4.1.0
+executors:
+  node:
+    docker:
+      - image: circleci/node
+        auth:
+          username: $DOCKER_LOGIN
+          password: $DOCKER_PASSWORD
+  browsers:
+    docker:
+      - image: circleci/node:latest-browsers
+        auth:
+          username: $DOCKER_LOGIN
+          password: $DOCKER_PASSWORD
+jobs:
+  build-compile-fend:
+    executor: node
+    steps:
+      - checkout
+      - run: cd udagram-frontend && npm install
+      - run: cd udagram-frontend && npm run build
+  copy-frontend-files-s3:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+
+      - run:
+          name: Install npm
+          command: |
+            apk add --update npm
+      - run: cd udagram-frontend && npm install
+      - run: cd udagram-frontend && npm run build
+      - run:
+          name: Install awscli
+          command: |
+            pip3 install awscli 
+      - run: aws s3 cp udagram-frontend/www s3://${AWS_BUCKET}/ --recursive
+  deploy-backend-ebs:
+    docker:
+      - image: cimg/node:15.9.0
+    steps:
+      - checkout
+      - eb/setup
+      - run: cd udagram-api && npm install
+      - run: cd udagram-api && npm run build
+      - run: cd udagram-api && npm run deploy
+
+workflows:
+  node-build-tests:
+    jobs:
+      - deploy-backend-ebs
+      - build-compile-fend
+      - copy-frontend-files-s3:
+          requires:
+              - build-compile-fend
