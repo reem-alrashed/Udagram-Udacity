@@ -1,6 +1,6 @@
 # Udagram
 
-This application is provided to you as an alternative starter project if you do not wish to host your own code done in the previous courses of this nanodegree. The udagram application is a fairly simple application that includes all the major components of a Full-Stack web application.
+The udagram application is a fairly simple application that includes all the major components of a Full-Stack web application.
 
 ## Getting Started
 
@@ -72,12 +72,4 @@ This project contains two different test suite: unit tests and End-To-End tests(
 1. `npm run test`
 1. `npm run e2e`
 
-There are no Unit test on the back-end
 
-### Unit Tests:
-
-Unit tests are using the Jasmine Framework.
-
-### End to End Tests:
-
-The e2e tests are using Protractor and Jasmine.
